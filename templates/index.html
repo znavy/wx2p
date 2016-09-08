@@ -1,0 +1,106 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta charset="UTF-8">
+	<script type="text/javascript"> var Device = "H", DeviceVersion="1.0.0", DeviceTAB="TabDefault";</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+	<title>Login</title>
+	<link rel="stylesheet" href="/static/css/font-awesome.min.css">
+	<link rel='stylesheet prefetch' href='/static/css/bootstrap.min.css'>
+	<link rel="stylesheet" href="/static/css/style.css" media="screen" type="text/css" />
+	<script type="text/javascript" src="/static/js/jquery.js"></script>
+	<script>
+		$(function(){
+			function get_status(){
+				$.ajax({
+					url: "/login",
+					type: "post",
+					dataType: "json",
+					success: function(data){
+						if (data.errMsg == 'on'){
+							$('#palarm').html('Turn off alarm'); 
+						}else if(data.errMsg == 'off'){
+							$('#palarm').html('Turn on alarm');
+						}else{
+							$('#palarm').html('Alarm server is not avaliable');
+						}
+					}
+				});
+			}
+
+			function deploy(host){
+				$.ajax({
+					url: "/deploy",
+					type: "post",
+					dataType: "json",
+                                        data: {hostname:host}
+					success: function(data){
+						if (data.errCode == 0) {
+							alert('Operation successful');
+						}else{
+							alert('Operation failed');
+						}
+					}
+				});
+			}
+
+			get_status();
+
+			$('#alarm').on('click', function(){
+			    	
+			});
+
+			$('#ct25').on('click', function(){
+			    deploy('ct25');	
+			});
+
+			$('#ct26').on('click', function(){
+			    deploy('ct26')
+			});
+
+			$('#report').on('click', function(){
+				deploy('report');
+			});
+		});
+	</script>
+</head>
+
+<body class="login-page">
+	<div class="login-form">
+		<div class="login-content">
+			<form method="post" role="form" id="form_login">
+				<div class="form-group">
+					<button type="button" id="alarm" class="btn btn-primary btn-block btn-login">
+						<i class="fa fa-sign-in"></i>
+						<p id = "palarm">Getting alarm status... ...</p>
+					</button>
+				</div>
+				<div class="form-group">
+					<button type="button" id="ct25" class="btn btn-primary btn-block btn-login">
+						<i class="fa fa-sign-in"></i>
+						<p>Restart CHITU 25</p>
+					</button>
+				</div>
+				<div class="form-group">
+					<button type="button" id="ct26" class="btn btn-primary btn-block btn-login">
+						<i class="fa fa-sign-in"></i>
+						<p>Restart CHITU 26</p>
+					</button>
+				</div>
+				<div class="form-group">
+					<button type="button" id="report" class="btn btn-primary btn-block btn-login">
+						<i class="fa fa-sign-in"></i>
+						<p>Restart report</p>
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+ </div>
+</body>
+</html>
