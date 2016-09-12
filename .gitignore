@@ -1,3 +1,4 @@
 setting.py
 logs
 *.pyc
+*.yaml
