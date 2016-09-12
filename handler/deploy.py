@@ -11,8 +11,8 @@ from lib.deploy import Deploy
 
 
 class SmsSwitchHandler(handler.base.BaseHandler):
-    def __init__(self, *args, **argkws):
-        super(SmsSwitchHandler, self).__init__(*args, **argkws)
+    def initialize(self):
+        super(SmsSwitchHandler, self).initialize()
         if self._redis is None or self._redis.get('session') is None:
             self.redirect('/login')
         self.ret = dict(errCode = 0, errMsg = None)
@@ -50,8 +50,8 @@ class SmsSwitchHandler(handler.base.BaseHandler):
 
 
 class IndexHandler(handler.base.BaseHandler):
-    def __init__(self, *args, **argkws):
-        super(IndexHandler, self).__init__(*args, **argkws)
+    def initialize(self):
+        super(IndexHandler, self).initialize()
         self.deploy = Deploy()
 
 

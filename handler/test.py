@@ -2,6 +2,7 @@
 
 import tcelery
 from tasks import tasks
+from tornado import gen
 from tornado.web import asynchronous
 
 import handler.base
@@ -10,18 +11,19 @@ import handler.base
 tcelery.setup_nonblocking_producer()
 
 class TestHandler(handler.base.BaseHandler):
-    def __init__(self, *args, **argkws):
-        super(TestHandler, self).__init__(*args, **argkws)
+    def initialize(self):
+        super(TestHandler, self).initialize()
 
     
-    @asynchronous
+    #@asynchronous
     def get(self):
-        tasks.echo.apply_async(args = ['Hello world!'], callback = self.on_result)
-        #tasks.add.apply_async(args = [1, 2])
-        self.write('WTF')
-        self.finish()
+        #resp = tasks.echo.apply_async(args = ['Hello world!'], callback = self.on_result)
         #content = self.get_argument('content', 'Test')
         #tasks.send_wx_msg.apply_async(args = [content, ['heruihong']], callback = self.on_result)
+        #resp = yield gen.Task(tasks.echo.apply_async, args=['WTF'])
+        resp = tasks.echo.delay('XixixiHahaha')
+        self.write(str(resp))
+        self.finish()
 
 
     def on_result(self, response):

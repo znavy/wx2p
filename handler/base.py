@@ -6,34 +6,24 @@ import redis
 import logging
 import tornado.web
 
-#from lib import config
-import setting
 from lib.wechat_sdk import WeChatEnterprise
 
 
 class BaseHandler(tornado.web.RequestHandler):
-    def __init__(self,*argc,**argkw):
-        super(BaseHandler,self).__init__(*argc,**argkw)
-        try:
-            pool = redis.ConnectionPool(host = setting.R_HOST, port = setting.R_PORT, db = setting.R_DB)
-            self._redis = redis.Redis(connection_pool=pool)
-            
-            timestamp = str(int(time.time()))
-            # Check is Redis server  available ?
-            self._redis.set('isAvailable', timestamp, ex = 1)
-        except Exception, e:
-            logging.error(str(e))
-            self._redis = None
+    def initialize(self):
+        super(BaseHandler,self).initialize()
+        
+        self._redis = self.settings.get('_redis')
+        self.wcep = self.settings.get('wcep')
+        self.access_token = self.wcep.get_access_token()
 
-        wcep = WeChatEnterprise(access_token = None, agentID = 2)
-        self.access_token = None
 
-        if self._redis is not None:
-            access_token = self._redis.get("access_token")
-            if access_token:
-                self.access_token = access_token
-            else:
-                access_token = wcep.get_access_token()
-                if access_token is not None:
-                    self.access_token = access_token
-                    self._redis.set("access_token", access_token, ex = 7200)
+    def prepare(self):
+        self.add_header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-eval'; "
+                            "connect-src 'self'; img-src 'self' data:; style-src 'self'; "
+                            "font-src 'self'; frame-src 'self'; ")
+        self.add_header("X-Frame-Options", "deny")
+        self.add_header("X-XSS-Protection", "1; mode=block")
+        self.add_header("X-Content-Type-Options", "nosniff")
+        self.add_header("x-ua-compatible:", "IE=edge,chrome=1")
+        self.clear_header("Server")

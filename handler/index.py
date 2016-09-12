@@ -20,10 +20,8 @@ define('CorpID', default = 'wx74c026e563a3b7ed', help = '')
 
 
 class IndexHandler(handler.base.BaseHandler):
-    def __init__(self, *args, **argkws):
-	super(IndexHandler, self).__init__(*args, **argkws)
-        self.wxcpt = WXBizMsgCrypt(options.Token, options.EncodingAESKey, options.CorpID)
-        self.wcep = WeChatEnterprise(access_token = self.access_token, agentID = 2)
+    def initialize(self):
+	super(IndexHandler, self).initialize()
         self.deploy = Deploy()
 
 
@@ -110,8 +108,8 @@ class IndexHandler(handler.base.BaseHandler):
 
 
 class LoginHandler(handler.base.BaseHandler):
-    def __init__(self, *args, **argkws):
-        super(LoginHandler, self).__init__(*args, **argkws)
+    def initialize(self):
+        super(LoginHandler, self).initialize()
 
     def get(self):
         self.render('login.html')

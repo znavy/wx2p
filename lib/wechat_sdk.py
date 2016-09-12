@@ -4,29 +4,38 @@ import json
 import logging
 import requests as r
 
-#from lib import config
-import setting
-
 
 class ErrorCode(object):
     SUCCESS = 0
 
 class WeChatEnterprise(object):
-    def __init__(self, access_token = None, agentID = 0):
-        self.agentid = agentID
-        self.corpid = setting.CorpID
-        self.corpsecret = setting.Secret
-        self.url_prefix = setting.URL_PREFIX
-        self.access_token = access_token
+    def __init__(self, params):
+        self.redis = params.get('redis')
+        self.agentid = params.get('agentID')
+        self.corpid = params.get('CorpID')
+        self.corpsecret = params.get('Secret')
+        self.url_prefix = params.get('URL_PREFIX')
+        self.access_token = self.get_access_token()
 
 
     def get_access_token(self):
+        if self.redis is not None:
+            access_token = self.redis.get('access_token')
+            if access_token:
+                return access_token
+
         url = "%s/gettoken?corpid=%s&corpsecret=%s" % (self.url_prefix, self.corpid, self.corpsecret)
         try:
             resp = r.get(url)
             access_token = resp.json().get("access_token")
         except:
             access_token = None
+
+        try:
+            if self.redis is not None:
+                self.redis.set('access_token', access_token, ex = 7200)
+        except:
+            pass
         
         return access_token
 

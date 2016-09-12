@@ -1,0 +1,15 @@
+"mysql":
+    "host": "10.0.0.8"
+    "db": "database name"
+    "port": !!int "3306"
+"redis":
+    "host": "10.0.0.28"
+    "port": !!int "6379"
+    "db": !!int  "0"
+"wechat":
+   "agentID": !!int "2"
+   "CorpID": "wx74c026e563a3b7ed"
+   "Secret": "eunJXgsllGhEhMcYXhkoUXf2tUoGxDBL3qJHwG6q55M3IGodpiLrVp5pQiNdZCNn"
+   "Token": "lprJ8GFg9mojuSk"
+   "EncodingAESKey": "RI3mMWIJnxgiSzTLV3VdVghArmqAyHtgSHK1sLxiwAC"
+   "URL_PREFIX": "https://qyapi.weixin.qq.com/cgi-bin"

@@ -7,9 +7,8 @@ from lib.wechat_sdk import WeChatEnterprise
 
 
 class SendTextHandler(handler.base.BaseHandler):
-    def __init__(self, *args, **argkws):
-        super(SendTextHandler, self).__init__(*args, **argkws)
-        self.wcep = WeChatEnterprise(access_token = self.access_token, agentID = 2)
+    def initialize(self):
+        super(SendTextHandler, self).initialize()
 
 
     def get(self):
@@ -19,7 +18,6 @@ class SendTextHandler(handler.base.BaseHandler):
         content = self.get_argument("content", "Hello World")
         
         status, resp = self.wcep.send_msg2user(content, to_user = users, to_ptmt = None)
-        
         if not status:
             self.set_status(500)
         else:
@@ -27,11 +25,14 @@ class SendTextHandler(handler.base.BaseHandler):
         self.finish()
 
 
+    def post(self):
+        self.get()
+
+
 
 class DepartmentHandler(handler.base.BaseHandler):
-    def __init__(self, *args, **argkws):
-        super(DepartmentHandler, self).__init__(*args, **argkws)
-        self.wcep = WeChatEnterprise(access_token = self.access_token, agentID = 2)
+    def initialize(self):
+        super(DepartmentHandler, self).initialize()
 
 
     def get(self):
@@ -42,9 +43,8 @@ class DepartmentHandler(handler.base.BaseHandler):
 
 
 class UserHandler(handler.base.BaseHandler):
-    def __init__(self, *args, **argkws):
-        super(UserHandler, self).__init__(*args, **argkws)
-        self.wcep = WeChatEnterprise(access_token = self.access_token, agentID = 2)
+    def initialize(self):
+        super(UserHandler, self).initialize()
 
 
     def get(self):
