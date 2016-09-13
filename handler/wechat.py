@@ -3,7 +3,6 @@
 import json
 
 import handler.base
-from lib.wechat_sdk import WeChatEnterprise
 
 
 class SendTextHandler(handler.base.BaseHandler):

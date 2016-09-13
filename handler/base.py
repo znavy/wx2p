@@ -6,8 +6,6 @@ import redis
 import logging
 import tornado.web
 
-from lib.wechat_sdk import WeChatEnterprise
-
 
 class BaseHandler(tornado.web.RequestHandler):
     def initialize(self):

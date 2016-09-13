@@ -11,7 +11,6 @@ from fabric.api import execute
 
 from lib.deploy import Deploy
 from lib.wxBizMsgCrypt import WXBizMsgCrypt
-from lib.wechat_sdk import WeChatEnterprise
 
 
 define('Token', default = 'lprJ8GFg9mojuSk', help = '')

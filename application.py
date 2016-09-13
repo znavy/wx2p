@@ -10,11 +10,10 @@ import logging.config
 
 import tornado.web
 import tornado.ioloop
-from tornado.options import options, define, parse_command_line
-from tornado.log import access_log, gen_log, app_log, LogFormatter
 from redis.exceptions import ConnectionError
-
 from apscheduler.schedulers.tornado import TornadoScheduler
+from tornado.options import options, define, parse_command_line
+
 
 import handler
 from schedulers.health_check import _check
