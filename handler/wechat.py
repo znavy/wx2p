@@ -1,6 +1,8 @@
 #encoding=utf-8
 
 import json
+from tornado import gen
+from tornado.web import asynchronous
 
 import handler.base
 
@@ -9,7 +11,9 @@ class SendTextHandler(handler.base.BaseHandler):
     def initialize(self):
         super(SendTextHandler, self).initialize()
 
-
+    
+    @asynchronous
+    @gen.coroutine
     def get(self):
         user_str = self.get_argument("to_user", None)
         users = user_str.split('|') if user_str is not None else None

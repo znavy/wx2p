@@ -15,7 +15,8 @@ class TestHandler(handler.base.BaseHandler):
         super(TestHandler, self).initialize()
 
     
-    #@asynchronous
+    @asynchronous
+    @gen.coroutine
     def get(self):
         #resp = tasks.echo.apply_async(args = ['Hello world!'], callback = self.on_result)
         #content = self.get_argument('content', 'Test')

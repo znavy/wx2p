@@ -30,6 +30,7 @@ celery.conf.update(
 
 @celery.task
 def echo(msg, timestamp=False):
+    time.sleep(3)
     return "%s: %s" % (datetime.now(), msg) if timestamp else msg
 
 
