@@ -21,6 +21,7 @@ from lib.wechat_sdk import WeChatEnterprise
 
 
 define("config", default="./config.yaml", help="config file's full path")
+define("port", default="8888", help="Application port") 
 parse_command_line()
 
 settings = {
@@ -92,10 +93,13 @@ urls = [
 app = tornado.web.Application(urls, **settings)
 
 try:
-    app.listen(8888)
+    app.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
 except (KeyboardInterrupt, SystemExit):
-    pass
+    sys.exit(0)
 except:
-    raise
+    import traceback
+    print traceback.print_exc()
+finally:
+    sys.exit(0)
 
