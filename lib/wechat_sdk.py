@@ -33,7 +33,7 @@ class WeChatEnterprise(object):
 
         try:
             if self.redis is not None:
-                self.redis.set('access_token', access_token, ex = 7200)
+                self.redis.set('access_token', access_token, ex = 7100)
         except:
             pass
         

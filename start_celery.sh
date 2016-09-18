@@ -1,3 +1,3 @@
 #!/bin/bash
 
-celery -A tasks.tasks worker -Q celery --loglevel=info
+celery -A tasks.wechat worker -Q celery --loglevel=info
