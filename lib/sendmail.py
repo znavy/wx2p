@@ -38,7 +38,12 @@ class SendMail:
             msg['To'] = to
             msg['Subject'] = Header('Alert from wx2p...', 'utf-8').encode()
             
-            server.sendmail(_from, [to], msg.as_string())
+            resp = server.sendmail(_from, [to], msg.as_string())
             server.quit()
+            if len(resp) == 0:
+                return True
+            else:
+                return False
         except Exception, e:
             logging.error(str(e))
+            return False
