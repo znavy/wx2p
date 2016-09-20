@@ -1,6 +1,8 @@
 #encoding=utf-8
 
 import json
+import logging
+
 from tornado import gen
 from tornado.web import asynchronous
 
@@ -22,6 +24,11 @@ class SendTextHandler(handler.base.BaseHandler):
         
         status, resp = self.wcep.send_msg2user(content, to_user = users, to_ptmt = None)
         if not status:
+            if self.sendmail is not None:
+                content = json.dumps(resp)
+                self.sendmail._send('heruihong@chunghwa56.com', 'heruihong@chunghwa56.com', content, 'mmx') 
+
+            logging.error('Response from wx: ' + json.dumps(resp))
             self.set_status(500)
         else:
             self.set_status(200)

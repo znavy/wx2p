@@ -6,6 +6,8 @@ import redis
 import logging
 import tornado.web
 
+from lib.sendmail import SendMail
+
 
 class BaseHandler(tornado.web.RequestHandler):
     def initialize(self):
@@ -14,6 +16,13 @@ class BaseHandler(tornado.web.RequestHandler):
         self._redis = self.settings.get('_redis')
         self.wcep = self.settings.get('wcep')
         self.access_token = self.wcep.get_access_token()
+        
+        try:
+            mail_cnf = self.settings.get('mail')
+            self.sendmail = SendMail(mail_cnf.get('smtp'), mail_cnf.get('port') ,mail_cnf.get('username'), mail_cnf.get('passwd'))
+        except Exception, e:
+            logging.error('Error to inin sendmail: %s' % e)
+            self.sendmail = None
 
 
     def prepare(self):
