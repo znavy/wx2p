@@ -4,6 +4,7 @@
 import time,random
 from tornado.options import options,define
 import json
+import yaml
 import time
 import logging
 import hashlib
@@ -81,6 +82,17 @@ def _getTimestamp():
 
 def _getNonce():
     return random.randint(100000,1000000)
+
+
+def get_redis(redis_host, redis_port, redis_db = 0):
+    pool = redis.ConnectionPool(host = redis_host, port = redis_port, db = redis_db)
+    return redis.Redis(connection_pool=pool)
+
+
+def get_config_from_yaml(file):
+    with open(file) as f:
+        return yaml.load(f)
+
 
 if __name__ == '__main__':
     creatSign()
