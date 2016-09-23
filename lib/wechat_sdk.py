@@ -15,7 +15,7 @@ class WeChatEnterprise(object):
         self.corpid = params.get('CorpID')
         self.corpsecret = params.get('Secret')
         self.url_prefix = params.get('URL_PREFIX')
-        self.access_token = self.get_access_token()
+        #self.access_token = self.get_access_token()
 
 
     def get_access_token(self):
@@ -33,7 +33,7 @@ class WeChatEnterprise(object):
 
         try:
             if self.redis is not None:
-                self.redis.set('access_token', access_token, ex = 7100)
+                self.redis.set('access_token', access_token, ex = 7200)
         except:
             pass
         
@@ -58,14 +58,14 @@ class WeChatEnterprise(object):
         return self.__response(resp)
 
 
-    def send_msg2user(self, content, to_user = None, to_ptmt = None, to_tag = None, safe = 0 ,msg_type = "text", **kwargs):
-        url = "%s/message/send?access_token=%s" % (self.url_prefix, self.access_token)
+    def send_msg2user(self, access_token, content, to_user = None, to_ptmt = None, to_tag = None, safe = 0 ,msg_type = "text", **kwargs):
+        url = "%s/message/send?access_token=%s" % (self.url_prefix, access_token)
         data = {
             "safe": safe, 
             "msgtype": msg_type, 
             "agentid": self.agentid
         }
-        logging.info('Method send_msg2user > access_token: %s' % self.access_token)       
+        logging.info('Method send_msg2user > access_token: %s' % access_token)       
         messages = {"text": dict(content = content), 
                     "image": dict(media_id = kwargs.get("media_id")), 
                     "voice": dict(media_id = kwargs.get("media_id")),
@@ -93,14 +93,14 @@ class WeChatEnterprise(object):
         return status, resp
 
 
-    def get_department_list(self):
-        url = "%s/department/list?access_token=%s" % (self.url_prefix, self.access_token)
+    def get_department_list(self, access_token):
+        url = "%s/department/list?access_token=%s" % (self.url_prefix, access_token)
         status, resp = self.__get(url)
         return status, resp
 
 
-    def create_user(self, data):
-        url = "%s/user/create?access_token=%s" % (self.url_prefix, self.access_token)
+    def create_user(self, access_token, data):
+        url = "%s/user/create?access_token=%s" % (self.url_prefix, access_token)
         if data.get("userid") and data.get("name"):
             status, resp = self.__post(url, data)
         else:

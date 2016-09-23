@@ -22,13 +22,15 @@ class SendTextHandler(handler.base.BaseHandler):
         
         content = self.get_argument("content", "Hello World")
         
-        status, resp = self.wcep.send_msg2user(content, to_user = users, to_ptmt = None)
+        status, resp = self.wcep.send_msg2user(self.access_token, content, to_user = users, to_ptmt = None)
         if not status:
             if self.sendmail is not None:
-                self.sendmail._send('heruihong@chunghwa56.com', 'heruihong@chunghwa56.com', 'mmx', content) 
-
+                ret = self.sendmail._send('heruihong@chunghwa56.com', 'heruihong@chunghwa56.com', 'mmx', content)
+                if not ret:
+                    self.set_status(500)
+                    logging.error('Response from wx: ' + json.dumps(ret))
+            
             logging.error('Response from wx: ' + json.dumps(resp))
-            self.set_status(500)
         else:
             self.set_status(200)
         self.finish()
@@ -45,7 +47,7 @@ class DepartmentHandler(handler.base.BaseHandler):
 
 
     def get(self):
-        status, resp = self.wcep.get_department_list()
+        status, resp = self.wcep.get_department_list(self.access_token)
         self.write(json.dumps(dict(status = status, resp = resp)))
         self.finish()
 
@@ -67,7 +69,7 @@ class UserHandler(handler.base.BaseHandler):
         mobile = self.get_argument("mobile")
 
         data = dict(userid = userid, name = name, mobile = mobile, department = department)
-        status, resp = self.wcep.create_user(data)
+        status, resp = self.wcep.create_user(self.access_token, data)
         self.write(json.dumps(dict(status = status, resp = resp)))
         self.finish()
 
