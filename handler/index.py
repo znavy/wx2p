@@ -21,6 +21,7 @@ define('CorpID', default = 'wx74c026e563a3b7ed', help = '')
 class IndexHandler(handler.base.BaseHandler):
     def initialize(self):
 	super(IndexHandler, self).initialize()
+        self.wxcpt = WXBizMsgCrypt(options.Token, options.EncodingAESKey, options.CorpID)
         self.deploy = Deploy()
 
 
@@ -59,7 +60,7 @@ class IndexHandler(handler.base.BaseHandler):
                 content = 'Command execution failed'
                 if result:
                     content = 'Command execution successful'
-                status, resp = self.wcep.send_msg2user(content, to_user = users, to_ptmt = None)
+                status, resp = self.wcep.send_msg2user(self.access_token, content, to_user = users, to_ptmt = None)
         else:
             logging.error('Decrypt message failed')
         
