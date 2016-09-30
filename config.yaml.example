@@ -13,3 +13,8 @@
    "Token": "xxx"
    "EncodingAESKey": "xxx"
    "URL_PREFIX": "https://qyapi.weixin.qq.com/cgi-bin"
+"mail":
+    "smtp": "smtp.exmail.qq.com"
+    "port": !!int "465"
+    "username": "your_email_username"
+    "passwd": "password"
