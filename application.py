@@ -16,6 +16,7 @@ from tornado.options import options, define, parse_command_line
 
 import handler
 from schedulers.health_check import _check
+from schedulers.bad_guy import find_bad_guy
 from lib.wechat_sdk import WeChatEnterprise
 from lib.util import get_config_from_yaml, get_redis
 
@@ -81,6 +82,7 @@ settings['mail'] = config.get('mail')
 try:
     scheduler = TornadoScheduler()
     scheduler.add_job(_check, trigger = 'interval', args = [settings.get('wcep')], seconds = 60)
+    scheduler.add_job(find_bad_guy, trigger = 'interval', args = [settings.get('wcep')], seconds = 30)
     scheduler.start()
 except Exception, e:
     print 'Schedulers start failed: %s' % str(e)
