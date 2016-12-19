@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.7
+#!/opt/anaconda2/bin/python2.7
 
 import os
 import sys
@@ -15,8 +15,8 @@ from apscheduler.schedulers.tornado import TornadoScheduler
 from tornado.options import options, define, parse_command_line
 
 import handler
-from schedulers.health_check import _check
-from schedulers.bad_guy import find_bad_guy
+#from schedulers.health_check import _check
+#from schedulers.bad_guy import find_bad_guy
 from lib.wechat_sdk import WeChatEnterprise
 from lib.util import get_config_from_yaml, get_redis
 
@@ -79,6 +79,7 @@ except:
 settings['mail'] = config.get('mail')
 
 # Schedulers
+'''
 try:
     scheduler = TornadoScheduler()
     scheduler.add_job(_check, trigger = 'interval', args = [settings.get('wcep')], seconds = 60)
@@ -86,7 +87,7 @@ try:
     scheduler.start()
 except Exception, e:
     print 'Schedulers start failed: %s' % str(e)
-
+'''
 urls = [
     (r'/', 'handler.index.IndexHandler'),
     (r'/login', 'handler.index.LoginHandler'),
@@ -95,7 +96,7 @@ urls = [
     (r'/sendText', 'handler.wechat.SendTextHandler'),
     (r'/getDpmt', 'handler.wechat.DepartmentHandler'),
     (r'/user', 'handler.wechat.UserHandler'),
-    (r'/test', 'handler.test.TestHandler')
+	(r'/test', 'handler.test.TestHandler'),
 ]
 
 app = tornado.web.Application(urls, **settings)
