@@ -23,8 +23,9 @@ from lib.util import get_config_from_yaml, get_redis
 
 root_path = os.path.dirname(__file__)
 
-define("config", default=os.path.join(root_path,"config.yaml"), help="config file's full path")
-define("port", default="8888", help="Application port") 
+define("config", default=os.path.join(
+    root_path, "config.yaml"), help="config file's full path")
+define("port", default="8888", help="Application port")
 parse_command_line()
 
 settings = {
@@ -40,7 +41,7 @@ config = {}
 try:
     config = get_config_from_yaml(options.config)
 except yaml.scanner.ScannerError, e:
-    print 'Error Document Format: %s' % e 
+    print 'Error Document Format: %s' % e
     sys.exit(0)
 except IOError:
     print '[Errno 2] No such file or directory: %s' % options.config
@@ -57,7 +58,7 @@ try:
     # test connection
     # Check is Redis server  available ?
     timestamp = str(int(time.time()))
-    _redis.set('isAvailable', timestamp, ex = 1)
+    _redis.set('isAvailable', timestamp, ex=1)
 except KeyError:
     print 'Can not connect Redis server, check your config.yaml'
     sys.exit(0)
@@ -96,7 +97,7 @@ urls = [
     (r'/sendText', 'handler.wechat.SendTextHandler'),
     (r'/getDpmt', 'handler.wechat.DepartmentHandler'),
     (r'/user', 'handler.wechat.UserHandler'),
-	(r'/test', 'handler.test.TestHandler'),
+    (r'/test', 'handler.test.TestHandler'),
 ]
 
 app = tornado.web.Application(urls, **settings)
@@ -111,4 +112,3 @@ except:
     print traceback.print_exc()
 finally:
     sys.exit(0)
-

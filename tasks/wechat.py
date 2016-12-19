@@ -6,7 +6,6 @@ from datetime import datetime
 from lib.wechat_sdk import WeChatEnterprise
 
 
-
 @celery.task
 def echo(msg, timestamp=False):
     time.sleep(3)
@@ -20,6 +19,7 @@ def add(x, y):
 
 
 @celery.task
-def send_wx_msg(content, to_user, to_ptmt = None):
-    status, resp = wechat.send_msg2user(content, to_user = users, to_ptmt = to_ptmt)
+def send_wx_msg(content, to_user, to_ptmt=None):
+    status, resp = wechat.send_msg2user(
+        content, to_user=users, to_ptmt=to_ptmt)
     return 'wtf'
