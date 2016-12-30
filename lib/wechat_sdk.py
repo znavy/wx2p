@@ -9,10 +9,9 @@ class ErrorCode(object):
     SUCCESS = 0
 
 
-class WeChatEnterprise(object):
+class WeChatEnterprise():
 
     def __init__(self, params):
-        self.redis = params.get('redis')
         self.agentid = params.get('agentID')
         self.corpid = params.get('CorpID')
         self.corpsecret = params.get('Secret')
@@ -20,11 +19,6 @@ class WeChatEnterprise(object):
         #self.access_token = self.get_access_token()
 
     def get_access_token(self):
-        if self.redis is not None:
-            access_token = self.redis.get('access_token')
-            if access_token:
-                return access_token
-
         url = "%s/gettoken?corpid=%s&corpsecret=%s" % (
             self.url_prefix, self.corpid, self.corpsecret)
         try:
@@ -32,12 +26,6 @@ class WeChatEnterprise(object):
             access_token = resp.json().get("access_token")
         except:
             access_token = None
-
-        try:
-            if self.redis is not None:
-                self.redis.set('access_token', access_token, ex=7200)
-        except:
-            pass
 
         return access_token
 

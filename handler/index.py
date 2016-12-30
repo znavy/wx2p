@@ -53,18 +53,11 @@ class IndexHandler(handler.base.BaseHandler):
         if ret in [0, '0']:
             rec_msg = lib.util.parseXml(xml_content)
             logging.info(json.dumps(rec_msg))
-            if rec_msg is not None and rec_msg.get('MsgType', None) == 'text':
-                users = [rec_msg.get('FromUserName', 'who')]
-                result = self.cmdProcess(rec_msg)
-                content = 'Command execution failed'
-                if result:
-                    content = 'Command execution successful'
-                status, resp = self.wcep.send_msg2user(
-                    self.access_token, content, to_user=users, to_ptmt=None)
         else:
             logging.error('Decrypt message failed')
         self.write('success')
         self.finish()
+
 
     def cmdProcess(self, req):
         users = [req.get('FromUserName', 'who')]

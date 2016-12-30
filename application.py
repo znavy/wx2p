@@ -46,6 +46,7 @@ except yaml.scanner.ScannerError, e:
 except IOError:
     print '[Errno 2] No such file or directory: %s' % options.config
     sys.exit(0)
+# MySQL
 
 # Redis
 _redis = None
@@ -70,7 +71,6 @@ else:
 # wechat
 try:
     params = config.get('wechat')
-    params['redis'] = settings.get('_redis')
     wcep = WeChatEnterprise(params)
     settings['wcep'] = wcep
 except:
@@ -84,7 +84,6 @@ settings['mail'] = config.get('mail')
 try:
     scheduler = TornadoScheduler()
     scheduler.add_job(_check, trigger = 'interval', args = [settings.get('wcep')], seconds = 60)
-    scheduler.add_job(find_bad_guy, trigger = 'interval', args = [settings.get('wcep')], seconds = 30)
     scheduler.start()
 except Exception, e:
     print 'Schedulers start failed: %s' % str(e)
@@ -97,7 +96,7 @@ urls = [
     (r'/sendText', 'handler.wechat.SendTextHandler'),
     (r'/getDpmt', 'handler.wechat.DepartmentHandler'),
     (r'/user', 'handler.wechat.UserHandler'),
-    (r'/test', 'handler.test.TestHandler'),
+    (r'/sendTextAsync', 'handler.test.TestHandler'),
 ]
 
 app = tornado.web.Application(urls, **settings)
