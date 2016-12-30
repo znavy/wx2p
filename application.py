@@ -15,8 +15,7 @@ from apscheduler.schedulers.tornado import TornadoScheduler
 from tornado.options import options, define, parse_command_line
 
 import handler
-#from schedulers.health_check import _check
-#from schedulers.bad_guy import find_bad_guy
+from lib.database import DB
 from lib.wechat_sdk import WeChatEnterprise
 from lib.util import get_config_from_yaml, get_redis
 
@@ -47,7 +46,10 @@ except IOError:
     print '[Errno 2] No such file or directory: %s' % options.config
     sys.exit(0)
 # MySQL
-
+try:
+	db = DB(config['mysql'])
+except Exception, e:
+	logging.error('Error to init mysql: %s' % str(e))
 # Redis
 _redis = None
 try:
