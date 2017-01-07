@@ -28,7 +28,6 @@ $(function () {
     CollectGarbage();
 });
 
-//柱状图（货量排名）
 function GetBar() {
     var myChart = echarts.init(document.getElementById('echartbarA'), 'dark');
     option = {
@@ -281,7 +280,6 @@ function randomData() {
     myChart.setOption(option);
 }
 
-///全国实时1
 function funJson() {
     $.ajax({
 		url: 'http://alert.ane56.com/trigger',
@@ -311,11 +309,10 @@ function funJson() {
 
 }
 
-///全国实时2
 function funJson2() {
     $.ajax({
-        url: 'http://103.6.223.14/screen/webservice/screenServerRest/operate/todayOrderService',
-        type: 'POST',
+		url: '',
+		type: 'POST',
         cache: false,
         async: false,
         dataType: 'json',
@@ -336,11 +333,10 @@ function funJson2() {
 
 }
 
-///全国实时3
 function funJson3() {
     $.ajax({
-        url: 'http://103.6.223.14/screen/webservice/screenServerRest/operate/todayOrderBy15TotalService',
-        type: 'POST',
+		url: '',
+		type: 'POST',
         cache: false,
         async: false,
         dataType: 'json',
