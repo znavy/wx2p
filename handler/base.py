@@ -13,16 +13,16 @@ class BaseHandler(tornado.web.RequestHandler):
 	
 	def initialize(self):
 		super(BaseHandler, self).initialize()
-
+		
 		self._redis = self.settings.get('_redis')
 		self.wcep = self.settings.get('wcep')
 		access_token = self._redis.get('access_token')
 		if access_token:
-			this.access_token = access_token
+			self.access_token = access_token
 		else:
 			self.access_token = self.wcep.get_access_token()
-			if access_token and self._redis:
-				self._redis.set('access_token', access_token, ex=7200)
+			if self.access_token and self._redis:
+				self._redis.set('access_token', self.access_token, ex = 7200)
 				
 				
 	def prepare(self):

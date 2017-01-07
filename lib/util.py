@@ -89,7 +89,7 @@ def _getNonce():
 
 def get_redis(redis_host, redis_port, redis_db=0):
     pool = redis.ConnectionPool(host=redis_host, port=redis_port, db=redis_db)
-    return redis.Redis(connection_pool=pool)
+    return redis.Redis(connection_pool=pool, socket_timeout = 2)
 
 
 def get_config_from_yaml(file):

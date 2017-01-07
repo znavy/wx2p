@@ -3,14 +3,13 @@
 
 
 import peewee
-from playhouse.signals import Model as _model
 
 
 class DB(object):
 	
 	def __init__(self, kw):
-		self.config = kw
-		self.db = peewee.MySQLDatabase(self.config.pop('db'), **self.config)
+		self.db_config = kw
+		self.db = peewee.MySQLDatabase(self.db_config.pop('db'), **self.db_config)
 
 
 	def connect(self):

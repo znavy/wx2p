@@ -23,15 +23,17 @@ class SendTextHandler(handler.base.BaseHandler):
 		
 		user_str = self.get_argument("to_user", None)
 		content = self.get_argument("content", None)
-		if None in [user_str, content]:
-			ret = dict(errCode=10001, errMsg='Missing parameter to_user/content')
+		event_id = self.get_argument("event_id", 0)
+		if None in [user_str, content, event_id]:
+			ret = dict(errCode=10001, errMsg='Missing parameter to_user/content/event_id')
 			self.write(json.dumps(ret))
 			self.finish()
 			return
 		
 		users = user_str.split('|') if not isinstance(user_str, list) else user_str
-		
-		#content += '/\n/<a href="http://alert.ane56.com"/>点我点我</a>'
+		#link = '<a href="http://alert.ane56.com/event/%s">Hit Me</a>' % event_id
+		#content = '%s %s' % (content, link)
+		logging.info(content)
 		status, resp = self.wcep.send_msg2user(self.access_token, content, to_user=users, to_ptmt=None)
 		if not status:
 			logging.error('Response from wx: ' + json.dumps(resp))
