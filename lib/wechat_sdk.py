@@ -39,8 +39,10 @@ class WeChatEnterprise():
 	
 	def __post(self, url, data):
 		#header = {"content-type": "application/json"}
-		resp = r.post(url, data=json.dumps(data).decode('unicode-escape').encode("utf-8")).json()
-		#resp = r.post(url, data = json.dumps(data, encoding='utf-8', ensure_ascii=False), headers = header).json()
+		xx = json.dumps(data).decode('unicode-escape').encode("utf-8")
+		logging.info(xx)
+		#resp = r.post(url, data=json.dumps(data).decode('unicode-escape').encode("utf-8")).json()
+		resp = r.post(url, data = xx).json()
 		return self.__response(resp)
 	
 	

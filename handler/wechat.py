@@ -8,12 +8,14 @@ from tornado.web import asynchronous
 
 import handler.base
 from tasks import wechat
+from models.wx_msg import WxMsgSendDetailModel
 
 
 class SendTextHandler(handler.base.BaseHandler):
 	
 	def initialize(self):
 		super(SendTextHandler, self).initialize()
+		self.wxModel = WxMsgSendDetailModel()
 		
 	
 	@asynchronous
@@ -24,17 +26,26 @@ class SendTextHandler(handler.base.BaseHandler):
 		
 		user_str = self.get_argument("to_user", None)
 		content = self.get_argument("content", None)
-		event_id = self.get_argument("event_id", 0)
-		if None in [user_str, content, event_id]:
-			ret = dict(errCode=10001, errMsg='Missing parameter to_user/content/event_id')
+		if None in [user_str, content]:
+			ret = dict(errCode=10001, errMsg='Missing parameter to_user/content')
 			self.write(json.dumps(ret))
 			self.finish()
 			return
 		
+		try:
+			self.wxModel.content = content
+			self.wxModel.send_to = user_str
+			self.wxModel.save()
+			issue_id = self.wxModel.id
+		except:
+			logging.error('Message content saved failed:%a' % content)
+
 		users = user_str.split(',') if not isinstance(user_str, list) else user_str
-		#link = '<a href="http://alert.ane56.com/event/%s">Hit Me</a>' % event_id
-		#content = '%s %s' % (content, link)
-		logging.info(content)
+		
+		if self._redis and self._redis.get('link'):
+			link = "<a href='http://%s/issue/%s'>点我</a>" % (self.request.headers.get('Host'), issue_id)
+			content = '%s %s' % (content, link)
+		
 		status, resp = self.wcep.send_msg2user(self.access_token, content, to_user=users, to_ptmt=None)
 		if not status:
 			logging.error('Response from wx: ' + json.dumps(resp))

@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+	<script type="text/javascript" src="../static/js/jquery-1.9.1/jquery.js"></script>
+	<script type="text/javascript" src="../static/js/app/issue.js?v=0.1"></script>
+
+	<div class="login-form">
+		<div class="login-content">
+
+			<form method="post" role="form" id="form_login">
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon">
+							<i>Time</i>
+						</div>
+						<input type="hidden" id="issue_id" value="{{issue.id}}"></input>
+						<p class="form-control">{{issue.clock}}</p>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="input-group" style="">
+						<div class="input-group-addon">
+							<i>Message</i>
+						</div>
+						<p class="form-control" >
+						{{issue.content}} 
+						</p>
+					</div>
+				</div>
+				<!--div class="form-group">
+					<div class="input-group" style="">
+						<div class="input-group-addon">
+							<i>Head</i>
+						</div>
+						<input type="radio" name="xx" value="1">APP 
+						<input type="radio" name="xx" value="2">DB
+					</div>
+				</div-->
+				<div class="form-group">
+					<div class="input-group" style="">
+						<div class="input-group-addon">
+							<i>Type</i>
+						</div>
+						<select id="sel" class="form-control">
+							{% for t in types %}
+							<option value="{{t.id}}">{{t.name}}</option>
+							{% end %}
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="button" id="commit" class="btn btn-primary btn-block btn-login">
+						<i class="fa fa-sign-in"></i>
+						提交
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+ </div>
+{% end %}

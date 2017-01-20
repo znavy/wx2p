@@ -55,6 +55,7 @@ urls = [
     (r'/sendTextAsync', 'handler.wechat.SendTextAsyncHandler'),
 	(r'/xxoo', 'handler.test.ModelTestHandler'),
 	(r'/trigger', 'handler.zabbix.ZabbixTriggerHandler'),
+	(r'/issue/(\d+?)', 'handler.issue.IssueHandler')
 ]
 
 app = tornado.web.Application(urls, **settings)
