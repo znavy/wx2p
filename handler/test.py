@@ -23,6 +23,13 @@ class TestHandler(handler.base.BaseHandler):
 
 		users = user_str.split('|')
 		resp = wechat.send_wx_msg.delay(self.access_token, content, users)
+		
+		# Set event count
+		try:
+			self._set_event_count()
+		except:
+			pass
+
 		self.write(str(resp))
 
 

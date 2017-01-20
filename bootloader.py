@@ -46,6 +46,9 @@ def load_wechat():
 	
 	return wcep	
 
+server_port = config['server'].get('port', 8888)
+access_token = config['server'].get('access_token', 'access_token')
+
 # Schedulers
 '''
 try:

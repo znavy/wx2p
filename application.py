@@ -14,11 +14,11 @@ from apscheduler.schedulers.tornado import TornadoScheduler
 from tornado.options import options, define, parse_command_line
 
 import handler
-from bootloader import load_redis, load_wechat
+from bootloader import load_redis, load_wechat, server_port, access_token
 
 
 root_path = os.path.dirname(__file__)
-define("port", default="8888", help="Application port")
+#define("port", default="8888", help="Application port")
 parse_command_line()
 
 # log config
@@ -27,7 +27,7 @@ logging.config.dictConfig(yaml.load(open('logging.yaml', 'r')))
 settings = {
     "static_path": os.path.join(root_path, "static"),
     "template_path": os.path.join(root_path, "templates"),
-	"debug": False,
+	"debug": True,
 }
 
 try:
@@ -42,6 +42,8 @@ except Exception, e:
 	print 'Failed to init wechat: %s' % str(e)
 	sys.exit(0)
 
+settings['access_token'] = access_token
+
 urls = [
     (r'/', 'handler.index.IndexHandler'),
     (r'/login', 'handler.index.LoginHandler'),
@@ -50,7 +52,7 @@ urls = [
     (r'/sendText', 'handler.wechat.SendTextHandler'),
     (r'/getDpmt', 'handler.wechat.DepartmentHandler'),
     (r'/user', 'handler.wechat.UserHandler'),
-    (r'/sendTextAsync', 'handler.test.TestHandler'),
+    (r'/sendTextAsync', 'handler.wechat.SendTextAsyncHandler'),
 	(r'/xxoo', 'handler.test.ModelTestHandler'),
 	(r'/trigger', 'handler.zabbix.ZabbixTriggerHandler'),
 ]
@@ -58,7 +60,7 @@ urls = [
 app = tornado.web.Application(urls, **settings)
 
 try:
-    app.listen(options.port)
+    app.listen(server_port)
     tornado.ioloop.IOLoop.instance().start()
 except (KeyboardInterrupt, SystemExit):
     sys.exit(0)

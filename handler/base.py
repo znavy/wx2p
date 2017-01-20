@@ -5,6 +5,7 @@ import time
 import redis
 import logging
 import tornado.web
+from datetime import datetime
 
 from lib.sendmail import SendMail
 
@@ -16,13 +17,14 @@ class BaseHandler(tornado.web.RequestHandler):
 		
 		self._redis = self.settings.get('_redis')
 		self.wcep = self.settings.get('wcep')
-		access_token = self._redis.get('access_token')
+		at_key = self.settings.get('access_token')
+		access_token = self._redis.get(at_key)
 		if access_token:
 			self.access_token = access_token
 		else:
 			self.access_token = self.wcep.get_access_token()
 			if self.access_token and self._redis:
-				self._redis.set('access_token', self.access_token, ex = 7200)
+				self._redis.set(at_key, self.access_token, ex = 7200)
 				
 				
 	def prepare(self):
@@ -34,3 +36,13 @@ class BaseHandler(tornado.web.RequestHandler):
 		self.add_header("X-Content-Type-Options", "nosniff")
 		self.add_header("x-ua-compatible:", "IE=edge,chrome=1")
 		self.clear_header("Server")
+
+
+	def _set_event_count(self):
+		cur_date_str = datetime.now().strftime('%Y-%m-%d')
+		if self._redis:
+			count = self._redis.get(cur_date_str)
+			if count:
+				self._redis.set(cur_date_str, int(count)+1)
+			else:
+				self._redis.set(cur_date_str, 1)
