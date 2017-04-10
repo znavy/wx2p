@@ -1,6 +1,7 @@
 # encoding=utf-8
 
 import json
+import time
 import logging
 
 from tornado import gen
@@ -35,6 +36,8 @@ class SendTextHandler(handler.base.BaseHandler):
 		try:
 			self.wxModel.content = content
 			self.wxModel.send_to = user_str
+			self.wxModel.clock = int(time.time())
+			self.wxModel.uptime = int(time.time())
 			self.wxModel.save()
 			issue_id = self.wxModel.id
 		except:
