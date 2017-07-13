@@ -1,5 +1,6 @@
 # encoding=utf-8
 
+import re
 import json
 import time
 import logging
@@ -9,7 +10,7 @@ from tornado.web import asynchronous
 
 import handler.base
 from tasks import wechat
-from models.wx_msg import WxMsgSendDetailModel
+from models.wx_msg import WxMsgSendDetailModel, WxMsgStats
 
 
 class SendTextHandler(handler.base.BaseHandler):
@@ -17,7 +18,9 @@ class SendTextHandler(handler.base.BaseHandler):
 	def initialize(self):
 		super(SendTextHandler, self).initialize()
 		self.wxModel = WxMsgSendDetailModel()
-		
+		self.p_jmx = re.compile("(.+?) JMX is not reachable")
+		self.p_agent = re.compile("Zabbix agent on (.+?) is unreachable for 5 minutes")
+
 	
 	@asynchronous
 	@gen.coroutine
@@ -27,6 +30,13 @@ class SendTextHandler(handler.base.BaseHandler):
 		
 		user_str = self.get_argument("to_user", None)
 		content = self.get_argument("content", None)
+
+		is_match = self.p_jmx.search(content) or self.p_agent.search(content)
+		if is_match:
+			self.write(json.dumps(dict(errCode = 0, errMsg='pass')))
+			self.finish()
+			return
+
 		if None in [user_str, content]:
 			ret = dict(errCode=10001, errMsg='Missing parameter to_user/content')
 			self.write(json.dumps(ret))
@@ -40,8 +50,8 @@ class SendTextHandler(handler.base.BaseHandler):
 			self.wxModel.uptime = int(time.time())
 			self.wxModel.save()
 			issue_id = self.wxModel.id
-		except:
-			logging.error('Message content saved failed:%a' % content)
+		except Exception, e:
+			logging.error('Message content saved failed:%s' % str(e))
 
 		users = user_str.split(',') if not isinstance(user_str, list) else user_str
 		
@@ -56,11 +66,6 @@ class SendTextHandler(handler.base.BaseHandler):
 		else:
 			ret = dict(errCode = 0, errMsg='')
 		
-		# Set event count
-		try:
-			self._set_event_count()
-		except:
-			pass
 
 		self.write(json.dumps(ret))
 		self.finish()
@@ -75,30 +80,79 @@ class SendTextAsyncHandler(handler.base.BaseHandler):
 
 	def initialize(self):
 		super(SendTextAsyncHandler, self).initialize()
+		self.p_jmx = re.compile("(.+?) JMX is not reachable")
+		self.p_agent = re.compile("Zabbix agent on (.+?) is unreachable for 5 minutes")
 
-	
+		
 	def get(self):
+		args = self.request.arguments
+		logging.info('arguments: %s' % json.dumps(args))
+		
 		content = self.get_argument('content', None)
+		content = json.loads(content)
+		
+		trigger_name = content['trigger_name']
+		host = content['host']
+		hostname = content['hostname']
+		ip = content['ip']
+		hostgroup = content['hostgroup']
+		event_id = content['eventid']
+
+		is_match = self.p_jmx.search(trigger_name) or self.p_agent.search(trigger_name)
+		if is_match:
+			self._agg(content)
+			self.write(json.dumps(dict(errCode = 0, errMsg = 'pass')))
+			self.finish()
+			return
+
 		user_str = self.get_argument('to_user', None)
 		if None in [content, user_str]:
 			self.write(json.dumps(dict(errCode = 10001, errMsg = 'Missing parameter to_user/content')))
+			self.finish()
 			return
 
 		users = user_str.split(',')
-		resp = wechat.send_wx_msg.delay(self.access_token, content, users)
+		#resp = wechat.send_wx_msg.delay(self.access_token, trigger_name, users)
+		resp = dict(errCode = 0, errMsg = '')
 
-		# Set event count
+		issue_id = 0
 		try:
-			self._set_event_count()
-		except:
-			pass
+			model = WxMsgStats()
+			model.content = trigger_name
+			model.send_to = user_str
+			model.clock = int(time.time())
+			model.uptime = int(time.time())
+			model.eventid = event_id
+			model.host_group = hostgroup
+			model.host = host
+			model.hostname = hostname
+			model.ip = ip
+			model.hostid = 0
+			
+			model.save()
+			issue_id = model.id
+		except Exception, e:
+			logging.error('Message content saved failed:%s' % str(e))
 	
+		if self._redis and self._redis.get('link') and issue_id != 0:
+			link = "<a href='http://%s/issue/%s'>点我</a>" % (self.request.headers.get('Host'), issue_id)
+
 		ret = dict(errCode = 0, errMsg = str(resp))
 		self.write(json.dumps(ret))
 
 
 	def post(self):
 		self.get()
+	
+
+	def _agg(self, content):
+		trigger_name = content['trigger_name']
+		eventid = int(content['eventid'])
+		key = 'alertjmx' if self.p_jmx.search(trigger_name) else 'alertagent'
+		ct = int(time.time())
+		print type(ct), type(eventid),key
+		self._redis.zadd(key, eventid, ct)
+
 
 
 		
@@ -136,3 +190,13 @@ class UserHandler(handler.base.BaseHandler):
 				
 		self.write(json.dumps(dict(status=status, resp=resp)))
 		self.finish()
+
+	
+class TestHandler(handler.base.BaseHandler):
+
+	def initialize(self):
+		super(TestHandler, self).initialize()
+
+
+	def get(self):
+		wechat.alert_agg.delay()

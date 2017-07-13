@@ -9,3 +9,4 @@ done
 sleep 2
 
 nohup celery -A tasks.wechat worker -Q celery --loglevel=info >> logs/task.log 2>&1 &
+nohup celery -A tasks.wechat beat --loglevel=info >> logs/task.log 2>&1 &

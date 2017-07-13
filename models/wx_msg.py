@@ -18,10 +18,30 @@ class WxMsgSendDetailModel(BaseModel):
 	clock = peewee.IntegerField(default = int(time.time()), index = True)
 	content = peewee.CharField(max_length = 300)
 	send_to = peewee.CharField(max_length = 50, index = True)
-	process_status = peewee.IntegerField(default = 0, index = True)
 	uptime = peewee.IntegerField(default = int(time.time()))
-	issue_head_id = peewee.IntegerField(default = 0)
-	issue_type_id = peewee.IntegerField(default = 0)
 
 	class Meta:
 		db_table = 't_wx_msg_send_detail'
+
+
+
+class WxMsgStats(BaseModel):
+	def __init__(self):
+		super(WxMsgStats, self).__init__()
+		
+	id = peewee.PrimaryKeyField()
+	clock = peewee.IntegerField(default = int(time.time()), index = True)
+	content = peewee.CharField(max_length = 300)
+	send_to = peewee.CharField(max_length = 50)
+	process_status = peewee.IntegerField(default = 0)
+	uptime = peewee.IntegerField(default = int(time.time()))
+	eventid = peewee.IntegerField(default = 0)
+	host_group = peewee.CharField(max_length = 50)
+	host = peewee.CharField(max_length = 100)
+	ip = peewee.CharField(max_length = 20)
+	hostname = peewee.CharField(max_length = 100)
+	hostid = peewee.IntegerField(default = 0)
+	
+	
+	class Meta:
+		db_table = 't_wx_msg_stats'

@@ -3,10 +3,12 @@ import time
 import json
 import logging
 import requests as r
-from datetime import datetime
+from celery.schedules import crontab
+from datetime import datetime, timedelta
 
 from . import celery, config
-
+from lib.util import get_redis
+from bootloader import load_wechat, zabbix
 
 agentid = config['wechat']['agentID']
 corpid = config['wechat']['CorpID']
@@ -63,3 +65,35 @@ def send_wx_msg(access_token, content, to_user = None, to_ptmt = None, to_tag = 
 	status, resp = __post(url, data)
 	logging.info('Post data: %s' % json.dumps(data))
 	return status, resp
+
+@celery.task(name = "alert_agg")
+def alert_agg():
+	redis = get_redis(config['redis']['host'], config['redis']['port'])
+	try:
+		now = int(time.time())
+		before5min = now - (60 * 5)
+		for k in ['alertjmx', 'alertagent']:
+			count = redis.zcount(k, before5min, now)
+			count = int(count)
+			print '%s, %s' % (k, count)
+			eventid = redis.zrangebyscore(k, before5min, now)
+			if count > 0:
+				#zbx = zabbix()
+				#hosts = zbx.host.get(host = '' output = ['name'])
+				#hosts = [host['name'] for host in hosts]
+				#print 'hosts: %s' % ','.join(hosts)
+				wechat = load_wechat()
+				access_token = wechat.get_access_token()
+				triggers = dict(alertjmx = 'Trigger JMX IS UNREACHABLE was triggered %s times in 5 minutes' % str(count), 
+						alertagent='Trigger ZBX AGENT IS UNREACHABLE war triggered %s times in 5 minutes' % str(count))
+				content = triggers[k]
+				send_wx_msg.delay(access_token, content, ['heruihong'])
+	except Exception, e:
+		print str(e)
+
+
+celery.conf.update(
+	CELERYBEAT_SCHEDULE = {
+		'perminute': {'task': 'alert_agg', 'schedule': crontab(minute='*/5')}
+		}
+)

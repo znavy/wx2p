@@ -5,6 +5,7 @@
 import os
 import sys
 import time
+from pyzabbix import ZabbixAPI
 from redis.exceptions import ConnectionError
 
 from lib.database import DB
@@ -45,6 +46,21 @@ def load_wechat():
 	wcep = WeChatEnterprise(params)
 	
 	return wcep	
+
+def zabbix():
+	zabbix_url =  config['zabbix']['api_url']
+	zabbix_header = {"Content-Type":"application/json"} 
+	zabbix_user   = config['zabbix']['user']
+	zabbix_pass   = config['zabbix']['passwd']
+	auth_code     = ""
+
+	zapi = ZabbixAPI(zabbix_url)
+	zapi.session.auth = (zabbix_user, zabbix_pass)
+	zapi.session.verify = False
+	zapi.timeout = 15.1
+	zapi.login(zabbix_user, zabbix_pass)
+
+	return zapi
 
 server_port = config['server'].get('port', 8888)
 access_token = config['server'].get('access_token', 'access_token')

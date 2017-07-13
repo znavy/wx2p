@@ -10,7 +10,7 @@ import logging.config
 import tornado.web
 import tornado.ioloop
 from redis.exceptions import ConnectionError
-from apscheduler.schedulers.tornado import TornadoScheduler
+#from apscheduler.schedulers.tornado import TornadoScheduler
 from tornado.options import options, define, parse_command_line
 
 import handler
@@ -27,7 +27,7 @@ logging.config.dictConfig(yaml.load(open('logging.yaml', 'r')))
 settings = {
     "static_path": os.path.join(root_path, "static"),
     "template_path": os.path.join(root_path, "templates"),
-	"debug": True,
+	"debug": False,
 }
 
 try:
@@ -55,7 +55,8 @@ urls = [
     (r'/sendTextAsync', 'handler.wechat.SendTextAsyncHandler'),
 	(r'/xxoo', 'handler.test.ModelTestHandler'),
 	(r'/trigger', 'handler.zabbix.ZabbixTriggerHandler'),
-	(r'/issue/(\d+?)', 'handler.issue.IssueHandler')
+	(r'/issue/(\d+?)', 'handler.issue.IssueHandler'),
+	(r'/test', 'handler.wechat.TestHandler')
 ]
 
 app = tornado.web.Application(urls, **settings)
