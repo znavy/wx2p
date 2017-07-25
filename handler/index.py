@@ -7,9 +7,11 @@ import handler.base
 import lib.util
 from tornado.options import define, options
 from fabric.api import execute
+from peewee import DoesNotExist
 
 from lib.deploy import Deploy
 from lib.wxBizMsgCrypt import WXBizMsgCrypt
+from models.user import UserModel
 
 
 define('Token', default='9RCG4czBSkJJ6l2', help='')
@@ -37,7 +39,16 @@ class IndexHandler(handler.base.BaseHandler):
 		self.write(_echostr)
 		self.finish()
 		'''
-		self.redirect('/login')
+		try:
+			user = UserModel.get(wx_id = self.userid)
+		except DoesNotExist, e:
+			user = None
+			logging.error('DoesNotExist: %s' % str(e))
+
+		if user:
+			self.write(self.userid)
+		else:
+			self.redirect('/login')
 		
 		
 	def post(self):
@@ -97,31 +108,3 @@ class IndexHandler(handler.base.BaseHandler):
 				retMsg = lib.util.toXMLStr(to_msg_dict)
 				
 		return retMsg
-	
-	
-class LoginHandler(handler.base.BaseHandler):
-	
-	def initialize(self):
-		super(LoginHandler, self).initialize()
-		
-		
-	def get(self):
-		self.render('login.html')
-		
-		
-	def post(self):
-		args = {k: self.get_argument(k) for k in self.request.arguments}
-		if args.has_key('username') and args.has_key('password') and self.check_auth(args):
-			#ret = {'errCode':0, 'errMsg':'Done'}
-			self._redis.set('session', 'haha', 30*60)
-			# self.redirect('/deploy')
-			ret = {'errCode': 0, 'errMsg': 'Done'}
-		else:
-			ret = {'errCode': 1, 'errMsg': 'Auth failed.'}
-			
-		self.write(json.dumps(ret))
-		self.finish()
-		
-		
-	def check_auth(self, args):
-		return args['username'] == 'chunghwa56' and args['password'] == '110'

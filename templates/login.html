@@ -1,22 +1,53 @@
-{% extends "layout.html" %}
+<html xmlns="http://www.w3.org/1999/xhtml">
 
-{% block content %}
+<head>
+	<meta charset="UTF-8">
+	<!--script type="text/javascript"> var Device = "H", DeviceVersion="1.0.0", DeviceTAB="TabDefault";</script-->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+	<title>xxx</title>
+	<link rel="stylesheet" href="static/css/font-awesome.min.css">
+	<link rel='stylesheet prefetch' href='static/css/bootstrap.min.css'>
+	<link rel="stylesheet" href="static/css/style.css" media="screen" type="text/css" />
+</head>
+
+<body class="login-page">
 	<script type="text/javascript" src="../static/js/jquery-1.9.1/jquery.js"></script>
 	<script>
 		$(function(){
 			$("#loginBtn").on('click', function(){
-				var uname = $("#username").val();
-				var pwd = $("#password").val();
-			  	alert('xxx');
-			  	return;
+				var number = $("#number").val();
+				var uname = $("#uname").val();
+				var mobile = $("#mobile").val();
+				var email = $("#email").val();
+				if (number == null || number == ''){
+					alert("工号没有填写");
+					return;
+				}
+				if (uname == null || uname == ''){
+					alert("姓名没有填写");
+					return;
+				}
+				if (mobile == null || mobile == ''){
+					alert("手机号没有填写");
+					return;
+				}
+				if (email == null || email == ''){
+					alert("邮箱没有填写");
+					return;
+				}
 				$.ajax({
 					url: "/login",
 					type: "post",
-					data: {username : uname, password : pwd},
+					data: {number : number, uname : uname, mobile:mobile, email:email},
 					dataType: "json",
 					success: function(data){
-						if (data.errCode == 0){
-							window.location.href = '/deploy';
+						if (data.errCode == '0' || data.errCode == 0){
+							window.location.href = "/";
 						}else{
 							alert(data.errMsg);
 						}
@@ -31,17 +62,33 @@
 				<div class="form-group">
 					<div class="input-group">
 						<div class="input-group-addon">
-							<i class="fa fa-user"></i>
+							<i class="fa fa-sort-numeric-asc"></i>
 						</div>
-						<input type="text" class="form-control" name="username" id="username" placeholder="Username" autocomplete="off" />
+						<input type="text" class="form-control" name="number" id="number" placeholder="工号" autocomplete="off" />
 					</div>
 				</div>
 				<div class="form-group">
 					<div class="input-group">
 						<div class="input-group-addon">
-							<i class="fa fa-key"></i>
+							<i class="fa fa-user"></i>
 						</div>
-						<input type="password" class="form-control" name="password" id="password" placeholder="Password" autocomplete="off" />
+						<input type="text" class="form-control" name="uname" id="uname" placeholder="姓名" autocomplete="off" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon">
+							<i class="fa fa-mobile"></i>
+						</div>
+						<input type="text" class="form-control" name="mobile" id="mobile" placeholder="手机号" autocomplete="off" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon">
+							<i class="fa fa-paper-plane"></i>
+						</div>
+						<input type="text" class="form-control" name="email" id="email" placeholder="邮箱" autocomplete="off" />
 					</div>
 				</div>
 				<div class="form-group">
@@ -53,4 +100,5 @@
 			</form>
 		</div>
 	</div>
-{% end %}
+</body>
+</html>

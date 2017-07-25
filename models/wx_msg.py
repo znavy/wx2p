@@ -10,10 +10,6 @@ from .base import BaseModel
 
 class WxMsgSendDetailModel(BaseModel):
 
-	def __init__(self):
-		super(WxMsgSendDetailModel, self).__init__()
-
-
 	id = peewee.PrimaryKeyField()
 	clock = peewee.IntegerField(default = int(time.time()), index = True)
 	content = peewee.CharField(max_length = 300)
@@ -26,8 +22,6 @@ class WxMsgSendDetailModel(BaseModel):
 
 
 class WxMsgStats(BaseModel):
-	def __init__(self):
-		super(WxMsgStats, self).__init__()
 		
 	id = peewee.PrimaryKeyField()
 	clock = peewee.IntegerField(default = int(time.time()), index = True)

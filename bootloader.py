@@ -47,6 +47,11 @@ def load_wechat():
 	
 	return wcep	
 
+
+def load_wxcnf():
+	return config.get('wechat')
+
+
 def zabbix():
 	zabbix_url =  config['zabbix']['api_url']
 	zabbix_header = {"Content-Type":"application/json"} 

@@ -175,7 +175,9 @@ class UserHandler(handler.base.BaseHandler):
 		
 		
 	def get(self):
-		pass
+		userid = self.get_argument("userid")
+		status, resp = self.wcep.get_user(self.access_token, userid)
+		self.write(json.dumps(dict(status=status, resp=resp)))
 	
 	
 	def post(self):
@@ -190,6 +192,19 @@ class UserHandler(handler.base.BaseHandler):
 				
 		self.write(json.dumps(dict(status=status, resp=resp)))
 		self.finish()
+
+
+class TagHandler(handler.base.BaseHandler):
+
+	def initialize(self):
+		super(TagHandler, self).initialize()
+
+	
+	def get(self):
+		status, resp = self.wcep.get_tag(self.access_token, 1)
+		self.write(json.dumps(dict(status=status, resp=resp)))
+		self.finish()
+
 
 	
 class TestHandler(handler.base.BaseHandler):

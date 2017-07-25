@@ -14,7 +14,7 @@ from redis.exceptions import ConnectionError
 from tornado.options import options, define, parse_command_line
 
 import handler
-from bootloader import load_redis, load_wechat, server_port, access_token
+from bootloader import load_redis, load_wechat, server_port, access_token, load_wxcnf
 
 
 root_path = os.path.dirname(__file__)
@@ -38,6 +38,7 @@ except Exception, e:
 
 try:
 	settings['wcep'] = load_wechat()
+	settings['wxcnf'] = load_wxcnf()
 except Exception, e:
 	print 'Failed to init wechat: %s' % str(e)
 	sys.exit(0)
@@ -46,20 +47,22 @@ settings['access_token'] = access_token
 
 urls = [
     (r'/', 'handler.index.IndexHandler'),
-    (r'/login', 'handler.index.LoginHandler'),
+    (r'/login', 'handler.user.UserBindHandler'),
     (r'/smsSwitch', 'handler.deploy.SmsSwitchHandler'),
     (r'/deploy', 'handler.deploy.IndexHandler'),
     (r'/sendText', 'handler.wechat.SendTextHandler'),
     (r'/getDpmt', 'handler.wechat.DepartmentHandler'),
     (r'/user', 'handler.wechat.UserHandler'),
     (r'/sendTextAsync', 'handler.wechat.SendTextAsyncHandler'),
-	(r'/xxoo', 'handler.test.ModelTestHandler'),
+	(r'/alertblock', 'handler.alert.BlockHandler'),
+	(r'/restarthost', 'handler.alert.RestartHostsHandler'),
 	(r'/trigger', 'handler.zabbix.ZabbixTriggerHandler'),
+	(r'/tag', 'handler.wechat.TagHandler'),
 	(r'/issue/(\d+?)', 'handler.issue.IssueHandler'),
 	(r'/test', 'handler.wechat.TestHandler')
 ]
 
-app = tornado.web.Application(urls, **settings)
+app = tornado.web.Application(urls, cookie_secret = '0b507c24-0fd9-4adf-87f0-d9d72b229d57' ,**settings)
 
 try:
     app.listen(server_port)

@@ -100,7 +100,18 @@ class WeChatEnterprise():
 		else:
 			status, resp = False, 'userid or name is empty'
 		return status, resp
+
+	def get_user(self, access_token, userid):
+		url = "{0}/user/get?access_token={1}&userid={2}".format(self.url_prefix, access_token, userid)
+		status, resp = self.__get(url)
+		return status, resp
+
 	
+	def get_tag(self, access_token, tid):
+		url = "{0}/tag/get?access_token={1}&tagid={2}".format(self.url_prefix, access_token, tid)
+		status, resp = self.__get(url)
+		return status, resp
+
 	
 	def second_validation(self, userid):
 		pass

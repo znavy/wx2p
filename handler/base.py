@@ -2,9 +2,12 @@
 #-*- coding:utf-8 -*-
 
 import time
+import json
 import redis
+import urllib
 import logging
 import tornado.web
+import requests as r
 from datetime import datetime
 
 from lib.sendmail import SendMail
@@ -28,14 +31,36 @@ class BaseHandler(tornado.web.RequestHandler):
 				
 				
 	def prepare(self):
-		self.add_header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-eval'; "
-                        "connect-src 'self'; img-src 'self' data:; style-src 'self'; "
-                        "font-src 'self'; frame-src 'self'; ")
+		#self.add_header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-eval'; "
+        #                "connect-src 'self'; img-src 'self' data:; style-src 'self'; "
+        #                "font-src 'self'; frame-src 'self'; ")
 		self.add_header("X-Frame-Options", "deny")
 		self.add_header("X-XSS-Protection", "1; mode=block")
 		self.add_header("X-Content-Type-Options", "nosniff")
 		self.add_header("x-ua-compatible:", "IE=edge,chrome=1")
 		self.clear_header("Server")
+		if not self._is_pass_outh():
+			self._outh()
+
+
+	def _is_pass_outh(self):
+		uri = self.request.uri
+		white_list = ['/sendText', '/sendTextAsync']
+		return uri in white_list
+
+	
+	def _outh(self):
+		self.userid = self._get_current_user()
+		if self.userid is None:
+			code = self.get_argument('code', None)
+			if code:
+				logging.info('Got code %s' % code)
+				uid = self.getUid(code)
+				self.userid = uid
+				self._set_current_user(uid)
+			else:
+				logging.info('Not code given....')
+				self.getcode()
 
 
 	def _set_event_count(self):
@@ -46,3 +71,49 @@ class BaseHandler(tornado.web.RequestHandler):
 				self._redis.set(cur_date_str, int(count)+1)
 			else:
 				self._redis.set(cur_date_str, 1)
+
+
+	def _get_current_user(self):
+		return self.get_secure_cookie("userid")
+
+
+	def _set_current_user(self, userid):
+		self.set_secure_cookie("userid", userid, expires_days = 30)
+
+
+	def getUid(self, code):
+		base_url = 'https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?'
+		params = dict(access_token = self.access_token)
+		params['code'] = code
+		url = base_url + urllib.urlencode(params)
+		resp = r.get(url)
+		try:
+			logging.info('Getuserinfo resp: %s' % resp.text)
+			data = json.loads(resp.text)
+			return data['UserId'] if data.has_key('UserId') else data.get('OpenId', None)
+		except Exception, e:
+			logging.error('getuserinfo error: %s' % str(e))
+			return None
+
+
+	def getcode(self):
+		wxcnf = self.settings.get('wxcnf')
+		params = dict(appid = wxcnf['CorpID'])
+		params['redirect_uri'] = 'http://alert.ane56.com'
+		params['response_type'] = 'code'
+		params['scope'] = 'snsapi_base'
+		params['state'] = 'STATE#wechat'
+		urlstr = urllib.urlencode(params)
+		url = 'https://open.weixin.qq.com/connect/oauth2/authorize?' + urlstr
+		logging.info('url:%s' % url)
+		self.redirect(url)
+
+
+	def str2ts(self, s, format):
+		dt = datetime.strptime(s, format)
+		return int(time.mktime(dt.timetuple()))
+
+
+	def ts2str(self, ts):
+		ts = int(ts)
+		return datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')

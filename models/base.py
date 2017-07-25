@@ -9,10 +9,6 @@ from peewee import Model
 
 class BaseModel(Model):
 	
-	def __init__(self):
-		super(BaseModel, self).__init__()
-
-
 	def __str__(self):
 		r = {}
 		for k in self._data.keys():
