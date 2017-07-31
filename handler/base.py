@@ -10,7 +10,9 @@ import tornado.web
 import requests as r
 from datetime import datetime
 
+from lib.a10 import A10SDK
 from lib.sendmail import SendMail
+
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -117,3 +119,16 @@ class BaseHandler(tornado.web.RequestHandler):
 	def ts2str(self, ts):
 		ts = int(ts)
 		return datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+
+
+	def get_a10_session_id(self, a10sdk):
+		session_id = self._redis.get('a10_session_id')
+		if session_id is None:
+			logging.info('A10 session_id %s from server' % session_id)		
+			session_id = a10sdk.get_session_id()
+			self._redis.set('a10_session_id', session_id, ex = 180)
+		else:
+			logging.info('A10 session_id %s from redis' % session_id)
+
+		return session_id
+

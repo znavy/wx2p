@@ -14,7 +14,7 @@ from redis.exceptions import ConnectionError
 from tornado.options import options, define, parse_command_line
 
 import handler
-from bootloader import load_redis, load_wechat, server_port, access_token, load_wxcnf
+from bootloader import load_redis, load_wechat, server_port, access_token, load_wxcnf, a10_conf
 
 
 root_path = os.path.dirname(__file__)
@@ -44,6 +44,7 @@ except Exception, e:
 	sys.exit(0)
 
 settings['access_token'] = access_token
+settings['a10_conf'] = a10_conf()
 
 urls = [
     (r'/', 'handler.index.IndexHandler'),
@@ -59,6 +60,8 @@ urls = [
 	(r'/trigger', 'handler.zabbix.ZabbixTriggerHandler'),
 	(r'/tag', 'handler.wechat.TagHandler'),
 	(r'/issue/(\d+?)', 'handler.issue.IssueHandler'),
+	(r'/vports', 'handler.a10.VServerMemberHandler'),
+	(r'/vsmembers', 'handler.a10.ServiceGroupHandler'),
 	(r'/test', 'handler.wechat.TestHandler')
 ]
 

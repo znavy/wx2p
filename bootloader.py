@@ -67,6 +67,11 @@ def zabbix():
 
 	return zapi
 
+
+def a10_conf():
+	return config.get('A10')
+
+
 server_port = config['server'].get('port', 8888)
 access_token = config['server'].get('access_token', 'access_token')
 

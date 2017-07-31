@@ -22,7 +22,8 @@ class WeChatEnterprise():
 		try:
 			resp = r.get(url)
 			access_token = resp.json().get("access_token")
-		except:
+		except Exception ,e:
+			logging.error('Error to get access token from wx server:%s' % str(e))
 			access_token = None
 		
 		return access_token
