@@ -101,7 +101,7 @@ class BaseHandler(tornado.web.RequestHandler):
 	def getcode(self):
 		wxcnf = self.settings.get('wxcnf')
 		params = dict(appid = wxcnf['CorpID'])
-		params['redirect_uri'] = 'http://alert.ane56.com'
+		params['redirect_uri'] = wxcnf['redirect_uri']
 		params['response_type'] = 'code'
 		params['scope'] = 'snsapi_base'
 		params['state'] = 'STATE#wechat'

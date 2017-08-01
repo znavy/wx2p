@@ -46,7 +46,7 @@ class IndexHandler(handler.base.BaseHandler):
 			logging.error('DoesNotExist: %s' % str(e))
 
 		if user:
-			self.write(self.userid)
+			self.render('index.html')
 		else:
 			self.redirect('/login')
 		
