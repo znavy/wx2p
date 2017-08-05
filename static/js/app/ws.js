@@ -17,7 +17,7 @@ $(document).ready(function() {
 	ws.debug = true;
 	ws.timeoutInterval = 3000;
 
-	var $message = $('#event_total');
+	var $message = $('#ws_status');
 
 	tbl = $('#eventList').DataTable({
 		"columnDefs": [{"targets":0, "visible": false}, {"targets":1, "width":"20%"}, {"targets":2, "width":"20%"},{"targets":3, "width":"60%"}],
@@ -41,6 +41,8 @@ $(document).ready(function() {
 			fnDeleteRows(tbl, data.eventid)
 		}else{
 			tbl.row.add([data.eventid, data.dt, data.host, data.content]).draw( false );
+			audio4new(data);
+			// responsiveVoice.speak("收到新的告警 请查看", "Chinese Female");
 		}
 	}
 
@@ -61,5 +63,16 @@ $(document).ready(function() {
 		});
 
 		table.rows(indexes).remove().draw();
+	}
+
+	var audio4new = function(data){
+		var text = "收到新的告警请查看";
+		text = encodeURI(text);
+		var s = '<audio autoplay="autoplay">';
+		s += '<source src="http://tsn.baidu.com/text2audio?lan=zh&ctp=1&per=0&cuid=1&tok='+ data.tok +'&tex='+ text +'"  type="audio/mpeg">';
+		s += '<embed height="0" width="0" src="http://tsn.baidu.com/text2audio?lan=zh&per=0&ctp=1&cuid=1&tok='+ data.tok +'&tex='+ text+'">';
+		s += '</audio>';
+		console.log(s);
+		$("#audio4new").html(s);
 	}
 });

@@ -14,7 +14,7 @@ from redis.exceptions import ConnectionError
 from tornado.options import options, define, parse_command_line
 
 import handler
-from bootloader import load_redis,load_redis_conf, load_wechat, server_port, access_token, load_wxcnf, a10_conf
+from bootloader import config, load_redis,load_redis_conf, load_wechat, server_port, access_token, load_wxcnf, a10_conf
 
 
 root_path = os.path.dirname(__file__)
@@ -29,6 +29,8 @@ settings = {
     "template_path": os.path.join(root_path, "templates"),
 	"debug": False,
 }
+
+settings['config'] = config
 
 try:
 	settings['pool'] = load_redis()

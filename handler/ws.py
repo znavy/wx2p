@@ -39,8 +39,6 @@ class SocketHandler(websocket.WebSocketHandler):
 
 
 	def on_message(self, msg):
-		logging.info('-----msg body:{0}'.format(json.dumps(msg.body)))
-		logging.info(msg.kind)
 		if msg.kind == 'message':
 			self.write_message(msg.body)
 
@@ -60,9 +58,6 @@ class ApiHandler(BaseHandler):
 	def initialize(self):
 		super(ApiHandler, self).initialize()
 		
-		if self._redis is None:
-			logging.info('--------------ApiHandler redis is None---------')
-
 
 	def get(self):
 		self.finish()
@@ -73,11 +68,11 @@ class ApiHandler(BaseHandler):
 		eventid = self.get_argument("eventid")
 		status = self.get_argument("status")
 
-		data = dict(host = host, content = content, dt = dt, eventid = eventid, status = status)
+		tok = self._get_tts_tok()
+		data = dict(host = host, content = content, dt = dt, eventid = eventid, status = status, tok= tok)
 		logging.info(json.dumps(data))
 
 		ret = self._redis.publish('alert_channel', json.dumps(data))
-		logging.info(str(ret))
 
 
 	def post(self):

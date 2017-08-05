@@ -4,6 +4,7 @@ import re
 import json
 import time
 import logging
+from datetime import datetime
 
 from tornado import gen
 from tornado.web import asynchronous
@@ -97,6 +98,18 @@ class SendTextAsyncHandler(handler.base.BaseHandler):
 		ip = content['ip']
 		hostgroup = content['hostgroup']
 		event_id = content['eventid']
+		status = int(content['status'])
+		
+		dt = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+		tok = self._get_tts_tok()
+		data = dict(host = hostname, content = trigger_name, dt = dt, 
+				eventid = event_id, status = status, tok = tok)
+		self._redis.publish('alert_channel', json.dumps(data))
+		
+		if status in [1, '1']:
+			self.write(json.dumps(dict(errCode = 0, errMsg = 'status == 1 and pass')))
+			self.finish()
+			return
 
 		is_match = self.p_jmx.search(trigger_name) or self.p_agent.search(trigger_name)
 		if is_match:
@@ -150,10 +163,8 @@ class SendTextAsyncHandler(handler.base.BaseHandler):
 		eventid = int(content['eventid'])
 		key = 'alertjmx' if self.p_jmx.search(trigger_name) else 'alertagent'
 		ct = int(time.time())
-		print type(ct), type(eventid),key
 		self._redis.zadd(key, eventid, ct)
-
-
+	
 
 		
 class DepartmentHandler(handler.base.BaseHandler):

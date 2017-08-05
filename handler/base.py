@@ -133,3 +133,20 @@ class BaseHandler(tornado.web.RequestHandler):
 
 		return session_id
 
+
+	def _get_tts_tok(self):
+		ttsconf = self.settings['config']['tts']
+		tok = self._redis.get('tts_tok')
+		if tok is None:
+
+			params = dict(grant_type = 'client_credentials', 
+					client_id = ttsconf['apikey'],client_secret = ttsconf['secretkey'])
+			bdtts = 'https://openapi.baidu.com/oauth/2.0/token'
+			resp = r.get(bdtts, params = params)
+			data = json.loads(resp.text)
+			tok = data['access_token']
+			expires_in = data['expires_in']
+			self._redis.set('tts_tok', tok, ex = int(expires_in))
+			
+		return tok
+
