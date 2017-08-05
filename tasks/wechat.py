@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 from . import celery, config
 from lib.util import get_redis
 from bootloader import load_wechat, zabbix
+from models.user import UserModel
+
 
 agentid = config['wechat']['agentID']
 corpid = config['wechat']['CorpID']
@@ -34,8 +36,8 @@ def __get(url):
 
 @celery.task
 def echo(msg, timestamp=False):
-    time.sleep(3)
-    return "%s: %s" % (datetime.now(), msg) if timestamp else msg
+	time.sleep(3)
+	return "%s: %s" % (datetime.now(), msg) if timestamp else msg
 
 
 @celery.task
@@ -65,6 +67,16 @@ def send_wx_msg(access_token, content, to_user = None, to_ptmt = None, to_tag = 
 	status, resp = __post(url, data)
 	logging.info('Post data: %s' % json.dumps(data))
 	return status, resp
+
+
+@celery.task(name = "get_user")
+def get_user(access_token, userid):
+	url = "{0}/user/get?access_token={1}&userid={2}".format(url_prefix, access_token, userid)
+	status, resp = __get(url)
+	user = UserModel.get(UserModel.wx_id == userid)
+	user.wx_avatar = resp['avatar']
+	return user.save()
+
 
 @celery.task(name = "alert_agg")
 def alert_agg():

@@ -14,7 +14,7 @@ from redis.exceptions import ConnectionError
 from tornado.options import options, define, parse_command_line
 
 import handler
-from bootloader import load_redis, load_wechat, server_port, access_token, load_wxcnf, a10_conf
+from bootloader import load_redis,load_redis_conf, load_wechat, server_port, access_token, load_wxcnf, a10_conf
 
 
 root_path = os.path.dirname(__file__)
@@ -31,9 +31,10 @@ settings = {
 }
 
 try:
-	settings['_redis'] = load_redis()
+	settings['pool'] = load_redis()
+	settings['redis_conf'] = load_redis_conf()
 except Exception, e:
-	print 'Failed to init redis: %s' % str(e)
+	print 'Failed to init redis pool: %s' % str(e)
 	sys.exit(0)
 
 try:
@@ -62,6 +63,9 @@ urls = [
 	(r'/issue/(\d+?)', 'handler.issue.IssueHandler'),
 	(r'/vports', 'handler.a10.VServerMemberHandler'),
 	(r'/vsmembers', 'handler.a10.ServiceGroupHandler'),
+	(r'/eventList', 'handler.ws.IndexHandler'),
+	(r'/ws', 'handler.ws.SocketHandler'),
+	(r'/wsapi', 'handler.ws.ApiHandler'),
 	(r'/test', 'handler.wechat.TestHandler')
 ]
 

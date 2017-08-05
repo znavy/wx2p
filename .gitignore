@@ -2,6 +2,7 @@ setting.py
 logs
 *.pyc
 *.yaml
-.dir
-.bak
-.dat
+*.dir
+*.bak
+*.dat
+*.pid

@@ -1,0 +1,8 @@
+#eventList tbody tr {
+	background-color: #e2ebff;
+}
+
+#eventList tbody tr:hover{
+	background-color: #fccfcf;
+	cursor: pointer;
+}

@@ -5,6 +5,7 @@
 import os
 import sys
 import time
+import redis
 from pyzabbix import ZabbixAPI
 from redis.exceptions import ConnectionError
 
@@ -32,13 +33,9 @@ def load_redis():
 	redis_port = config['redis'].get('port', 6379)
 	redis_db = config['redis'].get('db', 0)
 	
-	_redis = get_redis(redis_host, redis_port, redis_db)
-	# test connection
-	# Check is Redis server  available ?
-	timestamp = str(int(time.time()))
-	_redis.set('isAvailable', timestamp, ex = 1)
-	
-	return _redis
+	pool = redis.ConnectionPool(host = redis_host, port = redis_port, db = redis_db)
+	return pool
+
 
 # wechat
 def load_wechat():
@@ -50,6 +47,9 @@ def load_wechat():
 
 def load_wxcnf():
 	return config.get('wechat')
+
+def load_redis_conf():
+	return config.get('redis')
 
 
 def zabbix():

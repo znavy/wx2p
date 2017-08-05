@@ -41,7 +41,11 @@
 					
 						<ul class="sidebar-menu">
 							<li class="header">
+							{% if avatar is not None %}
+								<img class="menu-avatar" src="{{ avatar }}">
+							{% else %}
 								<img class="menu-avatar" src="http://p.qlogo.cn/bizmail/EgkFYH8ticDrT0LRBXIWB1vfX4TvDbVrib4pB9xI8GQqkuyRicnb8aYicA/0">
+							{% end %}		
 							</li>
 							<li>
 								<a href="#" id="menu_dashboard"><i class="fa fa-dashboard"></i> <span>Dashboard</span> </a>

@@ -5,10 +5,15 @@ import logging
 
 import handler.base
 import lib.util
+
+from tornado import gen
+from tornado.web import asynchronous
 from tornado.options import define, options
+
 from fabric.api import execute
 from peewee import DoesNotExist
 
+from tasks.wechat import get_user
 from lib.deploy import Deploy
 from lib.wxBizMsgCrypt import WXBizMsgCrypt
 from models.user import UserModel
@@ -16,7 +21,7 @@ from models.user import UserModel
 
 define('Token', default='9RCG4czBSkJJ6l2', help='')
 define('EncodingAESKey',default='DvuavRvHBQiVzZaamVMaKjJbHNP5oIJeQBOssDetOQU', help='')
-define('CorpID', default='wx06222e02032c9b2f', help='')
+define('CorpID', default = 'wxshsgggggg4345dg', help='')
 
 
 class IndexHandler(handler.base.BaseHandler):
@@ -25,8 +30,10 @@ class IndexHandler(handler.base.BaseHandler):
 		super(IndexHandler, self).initialize()
 		self.wxcpt = WXBizMsgCrypt(options.Token, options.EncodingAESKey, options.CorpID)
 		self.deploy = Deploy()
-		
-		
+	
+
+	@asynchronous
+	@gen.coroutine
 	def get(self):
 		'''
 		sign = self.get_argument('msg_signature')
@@ -46,7 +53,9 @@ class IndexHandler(handler.base.BaseHandler):
 			logging.error('DoesNotExist: %s' % str(e))
 
 		if user:
-			self.render('index.html')
+			get_user.delay(self.access_token, self.userid)
+			avatar = user.wx_avatar if user.wx_avatar != '' else None
+			self.render('index.html', avatar = avatar)
 		else:
 			self.redirect('/login')
 		

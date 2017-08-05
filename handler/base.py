@@ -20,7 +20,8 @@ class BaseHandler(tornado.web.RequestHandler):
 	def initialize(self):
 		super(BaseHandler, self).initialize()
 		
-		self._redis = self.settings.get('_redis')
+		pool = self.settings.get('pool')
+		self._redis = redis.Redis(connection_pool = pool)
 		self.wcep = self.settings.get('wcep')
 		at_key = self.settings.get('access_token')
 		access_token = self._redis.get(at_key)
@@ -47,7 +48,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 	def _is_pass_outh(self):
 		uri = self.request.uri
-		white_list = ['/sendText', '/sendTextAsync']
+		white_list = ['/sendText', '/sendTextAsync', '/ws', '/wsapi', '/eventList']
 		return uri in white_list
 
 	
