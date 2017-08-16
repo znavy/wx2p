@@ -69,7 +69,7 @@ class ApiHandler(BaseHandler):
 		status = self.get_argument("status")
 
 		tok = self._get_tts_tok()
-		data = dict(host = host, content = content, dt = dt, eventid = eventid, status = status, tok= tok)
+		data = dict(host = host, content = content, dt = dt, eventid = eventid, status = status, tok= tok, is_sound = 1)
 		logging.info(json.dumps(data))
 
 		ret = self._redis.publish('alert_channel', json.dumps(data))
@@ -77,3 +77,37 @@ class ApiHandler(BaseHandler):
 
 	def post(self):
 		self.get()
+
+
+class PushHistoryHandler(BaseHandler):
+
+	def initialize(self):
+		super(PushHistoryHandler, self).initialize()
+
+	
+	def get(self):
+		alerts = self._redis.hgetall('alerts')
+		alerts = [json.loads(a) for a in alerts.values()]
+
+		ret = []
+		for a in alerts:
+			if int(a['status']) == 0:
+				tmp = a
+				tmp['is_sound'] = 0
+				ret.append(tmp)
+
+		self.write(json.dumps(ret))
+
+
+	def post(self):
+		eventid = self.get_argument('eventid', None)
+		ret = dict(errCode = 0, errMsg = 'Done')
+		if eventid is None:
+			ret = dict(errCode = 1, errMsg = 'No eventid given')
+		else:
+			try:
+				self._redis.hdel("alerts", eventid)
+			except Exception, e:
+				ret = dict(errCode = 2, errMsg = str(e))
+
+		self.write(json.dumps(ret))

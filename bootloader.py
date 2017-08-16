@@ -33,7 +33,7 @@ def load_redis():
 	redis_port = config['redis'].get('port', 6379)
 	redis_db = config['redis'].get('db', 0)
 	
-	pool = redis.ConnectionPool(host = redis_host, port = redis_port, db = redis_db)
+	pool = redis.ConnectionPool(host = redis_host, port = redis_port, db = redis_db, max_connections = 100)
 	return pool
 
 

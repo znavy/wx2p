@@ -103,13 +103,15 @@ class SendTextAsyncHandler(handler.base.BaseHandler):
 		dt = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 		tok = self._get_tts_tok()
 		data = dict(host = hostname, content = trigger_name, dt = dt, 
-				eventid = event_id, status = status, tok = tok)
+				eventid = event_id, status = status, tok = tok, is_sound = 1)
 		self._redis.publish('alert_channel', json.dumps(data))
-		
 		if status in [1, '1']:
+			self._del_alert(event_id)
 			self.write(json.dumps(dict(errCode = 0, errMsg = 'status == 1 and pass')))
 			self.finish()
 			return
+		else:
+			self._add_alert(data)
 
 		is_match = self.p_jmx.search(trigger_name) or self.p_agent.search(trigger_name)
 		if is_match:
@@ -158,6 +160,14 @@ class SendTextAsyncHandler(handler.base.BaseHandler):
 		self.get()
 	
 
+	def _add_alert(self, data):
+		self._redis.hset('alerts', str(data['eventid']), json.dumps(data))
+
+	
+	def _del_alert(self, event_id):
+		self._redis.hdel('alerts', str(event_id))
+
+	
 	def _agg(self, content):
 		trigger_name = content['trigger_name']
 		eventid = int(content['eventid'])

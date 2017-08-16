@@ -68,6 +68,7 @@ urls = [
 	(r'/eventList', 'handler.ws.IndexHandler'),
 	(r'/ws', 'handler.ws.SocketHandler'),
 	(r'/wsapi', 'handler.ws.ApiHandler'),
+	(r'/pushAlert', 'handler.ws.PushHistoryHandler'),
 	(r'/test', 'handler.wechat.TestHandler')
 ]
 
